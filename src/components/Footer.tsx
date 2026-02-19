@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
     return (
         <footer className="border-t border-slate-800 py-20 px-4 bg-slate-950">
@@ -21,28 +23,28 @@ export default function Footer() {
                         </h4>
                         <ul className="space-y-4 text-slate-400">
                             <li>
-                                <a
-                                    href="#features"
+                                <Link
+                                    href="/features"
                                     className="hover:text-indigo-400 transition-colors"
                                 >
                                     Features
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a
-                                    href="#"
+                                <Link
+                                    href="/"
                                     className="hover:text-indigo-400 transition-colors"
                                 >
                                     Pricing
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a
-                                    href="#"
+                                <Link
+                                    href="/"
                                     className="hover:text-indigo-400 transition-colors"
                                 >
                                     API Docs
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </div>
@@ -53,28 +55,28 @@ export default function Footer() {
                         </h4>
                         <ul className="space-y-4 text-slate-400">
                             <li>
-                                <a
-                                    href="#"
+                                <Link
+                                    href="/"
                                     className="hover:text-indigo-400 transition-colors"
                                 >
                                     Blog
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a
-                                    href="#"
+                                <Link
+                                    href="/"
                                     className="hover:text-indigo-400 transition-colors"
                                 >
                                     Resume Tips
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a
-                                    href="#"
+                                <Link
+                                    href="/"
                                     className="hover:text-indigo-400 transition-colors"
                                 >
                                     Career Guide
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </div>
@@ -85,28 +87,28 @@ export default function Footer() {
                         </h4>
                         <ul className="space-y-4 text-slate-400">
                             <li>
-                                <a
-                                    href="#"
+                                <Link
+                                    href="/"
                                     className="hover:text-indigo-400 transition-colors"
                                 >
                                     About Us
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a
-                                    href="#"
+                                <Link
+                                    href="/"
                                     className="hover:text-indigo-400 transition-colors"
                                 >
                                     Privacy Policy
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a
-                                    href="#"
+                                <Link
+                                    href="/"
                                     className="hover:text-indigo-400 transition-colors"
                                 >
                                     Terms of Service
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </div>
@@ -118,24 +120,18 @@ export default function Footer() {
                         reserved.
                     </p>
                     <div className="flex gap-8">
-                        <a
-                            href="#"
-                            className="hover:text-slate-300 transition-colors"
-                        >
-                            Twitter
-                        </a>
-                        <a
-                            href="#"
+                        <Link
+                            href="/"
                             className="hover:text-slate-300 transition-colors"
                         >
                             LinkedIn
-                        </a>
-                        <a
-                            href="#"
+                        </Link>
+                        <Link
+                            href="/"
                             className="hover:text-slate-300 transition-colors"
                         >
                             GitHub
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>

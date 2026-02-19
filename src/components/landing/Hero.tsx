@@ -35,7 +35,7 @@ export default function Hero() {
                             Get Started
                         </Button>
                     </Link>
-                    <Link href="/resume-evaluation" className="w-full sm:w-auto">
+                    <Link href="https://your-profiles.vercel.app/resume-evaluation" className="w-full sm:w-auto">
                         <Button className="w-full px-8 py-4 bg-slate-800/50 hover:bg-slate-700/50 text-white border border-slate-700 rounded-xl font-semibold text-lg transition-all backdrop-blur-sm active:scale-95">
                             Check Resume
                         </Button>
