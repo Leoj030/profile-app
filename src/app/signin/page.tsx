@@ -1,4 +1,5 @@
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
+import LogoutBtn from "@/components/auth/LogoutBtn";
 
 export default async function LoginPage() {
     return (
@@ -7,6 +8,7 @@ export default async function LoginPage() {
                 Sign in to access all the dashboard
             </h1>
             <GoogleSignInButton />
+            <LogoutBtn />
         </div>
     );
 }
