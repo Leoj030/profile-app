@@ -1,4 +1,4 @@
-import EvaluationView from "../EvaluationView";
+import EvaluationViewWrapper from "../EvaluationViewWrapper";
 import { mockEvaluationData } from "../mockData";
 
 export default async function DynamicResumeEvaluationPage({
@@ -9,5 +9,5 @@ export default async function DynamicResumeEvaluationPage({
     const { id } = await params;
     console.log("Loading evaluation (Server) for ID:", id);
 
-    return <EvaluationView data={mockEvaluationData} />;
+    return <EvaluationViewWrapper data={mockEvaluationData} />;
 }

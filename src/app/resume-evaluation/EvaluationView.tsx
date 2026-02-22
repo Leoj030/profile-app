@@ -13,12 +13,9 @@ import {
     ExitIcon,
     HamburgerMenuIcon,
 } from "@radix-ui/react-icons";
-import { Document, Page, pdfjs } from "react-pdf";
+import { Document, Page } from "react-pdf";
 import { EvaluationData, ModuleData, CheckResult } from "./types";
 import Link from "next/link";
-
-// Configure PDFJS worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.mjs`;
 
 // --- Constants ---
 
@@ -290,13 +287,12 @@ export default function EvaluationView({
     data: EvaluationData;
     pdfUrl?: string;
 }) {
-    const [numPages, setNumPages] = useState<number | null>(null);
     const [openAccordion, setOpenAccordion] = useState<string | null>(
         "Structure & Oranization",
     );
     const [isSidebarOpen, setSidebarOpen] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
-    const [pdfWidth, setPdfWidth] = useState(800);
+    const [pdfWidth, setPdfWidth] = useState(600);
 
     // Callback ref pattern for dynamic elements
     const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -310,7 +306,7 @@ export default function EvaluationView({
             const mobile = window.innerWidth < 1024;
             setIsMobile(mobile);
             setSidebarOpen(!mobile);
-            setPdfWidth(Math.min(window.innerWidth - (mobile ? 40 : 100), 800));
+            setPdfWidth(Math.min(window.innerWidth - (mobile ? 40 : 100), 600));
         };
         handleResize();
         window.addEventListener("resize", handleResize);
@@ -462,12 +458,10 @@ export default function EvaluationView({
 
                     <div className="relative group max-w-full">
                         <div className="absolute -inset-1 bg-linear-to-r from-indigo-500 to-purple-500 rounded-lg blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-                        <div className="relative bg-white shadow-2xl rounded-sm overflow-hidden transform transition-all duration-700 hover:scale-[1.01] origin-top max-w-full">
+                        <div className="relative bg-[#050810] shadow-2xl rounded-sm overflow-hidden transform transition-all duration-700 hover:scale-[1.01] origin-top max-w-full border border-slate-800/50 flex flex-col items-center">
                             <Document
                                 file={pdfUrl}
-                                onLoadSuccess={({ numPages }) =>
-                                    setNumPages(numPages)
-                                }
+                                className="flex flex-col items-center"
                                 loading={
                                     <div className="p-20 text-slate-500 font-bold italic animate-pulse">
                                         Scanning Resume Document...
@@ -475,24 +469,17 @@ export default function EvaluationView({
                                 }
                                 error={
                                     <div className="p-20 text-rose-500 font-bold border border-rose-500/20 bg-rose-500/5 rounded-xl">
-                                        Error loading PDF. Please verify the
-                                        file exists.
+                                        Error loading PDF.
                                     </div>
                                 }
                             >
-                                {Array.from(
-                                    new Array(numPages),
-                                    (el, index) => (
-                                        <Page
-                                            key={`page_${index + 1}`}
-                                            pageNumber={index + 1}
-                                            width={pdfWidth}
-                                            className="shadow-inner"
-                                            renderAnnotationLayer={true}
-                                            renderTextLayer={true}
-                                        />
-                                    ),
-                                )}
+                                <Page
+                                    pageNumber={1}
+                                    width={pdfWidth}
+                                    className="shadow-inner"
+                                    renderAnnotationLayer={false}
+                                    renderTextLayer={false}
+                                />
                             </Document>
                         </div>
                     </div>

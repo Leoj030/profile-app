@@ -1,6 +1,6 @@
-import EvaluationView from "../EvaluationView";
+import EvaluationViewWrapper from "../EvaluationViewWrapper";
 import { mockEvaluationData } from "../mockData";
 
 export default function ResumeEvaluationMockup() {
-    return <EvaluationView data={mockEvaluationData} />;
+    return <EvaluationViewWrapper data={mockEvaluationData} />;
 }
