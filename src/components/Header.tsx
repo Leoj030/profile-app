@@ -1,8 +1,18 @@
+"use client";
+
 import Hamburger from "./ui/Hamburger";
 import HeaderButton from "./header_components/HeaderButton";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
+    const pathname = usePathname();
+
+    // Hide header on resume evaluation results pages
+    const isEvaluationResult = pathname?.includes("/resume-evaluation/");
+
+    if (isEvaluationResult) return null;
+
     return (
         <header className="w-full h-20 fixed top-0 left-0 bg-slate-950/20 flex justify-center items-center px-6 backdrop-blur-md border-b border-slate-800/50 z-50">
             <div className="container max-w-7xl flex justify-between items-center w-full">
