@@ -13,7 +13,9 @@ import {
     ExitIcon,
     HamburgerMenuIcon,
 } from "@radix-ui/react-icons";
-import { Document, Page } from "react-pdf";
+import { Document, Page, pdfjs } from "react-pdf";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 import { EvaluationData, ModuleData, CheckResult } from "./types";
 import Link from "next/link";
 
