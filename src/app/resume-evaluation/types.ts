@@ -18,7 +18,7 @@ export interface ModuleData {
 }
 
 export interface EvaluationData {
-    "Structure & Oranization": ModuleData;
+    "Structure & Organization": ModuleData;
     "Language & Mechanics": ModuleData;
     "Impact & Metrics": ModuleData;
     "ATS Keyword Optimization": ModuleData;
