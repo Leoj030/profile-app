@@ -1,7 +1,7 @@
 import { EvaluationData } from "./types";
 
 export const mockEvaluationData: EvaluationData = {
-    "Structure & Oranization": {
+    "Structure & Organization": {
         "module_score": 85,
         "standard_headings": {
             "passed": true,
