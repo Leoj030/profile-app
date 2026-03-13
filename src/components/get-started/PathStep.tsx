@@ -7,6 +7,7 @@ export type UserPath = "job_seeker" | "recruiter";
 interface PathStepProps {
     onFinish: (path: UserPath) => void;
     onBack: () => void;
+    submitting?: boolean;
 }
 
 const PATHS: {
@@ -88,7 +89,7 @@ const PATHS: {
     },
 ];
 
-export default function PathStep({ onFinish, onBack }: PathStepProps) {
+export default function PathStep({ onFinish, onBack, submitting }: PathStepProps) {
     const [selected, setSelected] = useState<UserPath | null>(null);
 
     const handleFinish = () => {
@@ -111,25 +112,20 @@ export default function PathStep({ onFinish, onBack }: PathStepProps) {
             {/* Cards */}
             <div className="flex flex-col gap-3 w-full max-w-xs">
                 {PATHS.map((path) => {
-                    const isDisabled = path.id === "recruiter";
-
                     return (
                         <button
                             key={path.id}
-                            disabled={isDisabled}
-                            onClick={() => !isDisabled && setSelected(path.id)}
+                            onClick={() => setSelected(path.id)}
                             className={`
                                 relative flex items-start gap-4 p-5 rounded-2xl border text-left
                                 transition-all duration-200 group
                                 bg-linear-to-br ${path.gradient}
                                 ${
-                                    isDisabled
-                                        ? "opacity-60 cursor-not-allowed border-white/5 grayscale-[0.8]"
-                                        : selected === path.id
-                                          ? path.id === "job_seeker"
-                                              ? "border-purple-500/60 ring-2 ring-purple-500/20 cursor-pointer"
-                                              : "border-blue-500/60 ring-2 ring-blue-500/20 cursor-pointer"
-                                          : "border-white/8 hover:border-white/20 cursor-pointer"
+                                    selected === path.id
+                                        ? path.id === "job_seeker"
+                                            ? "border-purple-500/60 ring-2 ring-purple-500/20 cursor-pointer"
+                                            : "border-blue-500/60 ring-2 ring-blue-500/20 cursor-pointer"
+                                        : "border-white/8 hover:border-white/20 cursor-pointer"
                                 }
                             `}
                         >
@@ -147,11 +143,6 @@ export default function PathStep({ onFinish, onBack }: PathStepProps) {
                                     <p className="text-white font-semibold text-sm">
                                         {path.label}
                                     </p>
-                                    {isDisabled && (
-                                        <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] uppercase tracking-wider text-white/50 border border-white/10">
-                                            Coming Soon
-                                        </span>
-                                    )}
                                 </div>
                                 <p className="text-white/45 text-xs leading-relaxed">
                                     {path.description}
@@ -159,9 +150,8 @@ export default function PathStep({ onFinish, onBack }: PathStepProps) {
                             </div>
 
                             {/* Selection indicator */}
-                            {!isDisabled && (
-                                <div
-                                    className={`
+                            <div
+                                className={`
                                     w-5 h-5 rounded-full border-2 shrink-0 mt-0.5 flex items-center justify-center
                                     transition-all duration-200
                                     ${
@@ -172,25 +162,24 @@ export default function PathStep({ onFinish, onBack }: PathStepProps) {
                                             : "border-white/20"
                                     }
                                 `}
-                                >
-                                    {selected === path.id && (
-                                        <svg
-                                            width="10"
-                                            height="10"
-                                            viewBox="0 0 10 10"
-                                            fill="none"
-                                        >
-                                            <path
-                                                d="M2 5L4.5 7.5L8.5 3"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                        </svg>
-                                    )}
-                                </div>
-                            )}
+                            >
+                                {selected === path.id && (
+                                    <svg
+                                        width="10"
+                                        height="10"
+                                        viewBox="0 0 10 10"
+                                        fill="none"
+                                    >
+                                        <path
+                                            d="M2 5L4.5 7.5L8.5 3"
+                                            stroke="white"
+                                            strokeWidth="1.5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                )}
+                            </div>
                         </button>
                     );
                 })}
@@ -200,18 +189,18 @@ export default function PathStep({ onFinish, onBack }: PathStepProps) {
             <div className="w-full max-w-xs flex flex-col gap-2">
                 <button
                     onClick={handleFinish}
-                    disabled={!selected}
+                    disabled={!selected || submitting}
                     className={`
                         w-full py-3 rounded-xl font-semibold text-sm tracking-wide
                         transition-all duration-200 cursor-pointer
                         ${
-                            selected
+                            selected && !submitting
                                 ? "bg-purple-600 hover:bg-purple-500 text-white"
                                 : "bg-white/5 text-white/20 cursor-not-allowed"
                         }
                     `}
                 >
-                    Get started
+                    {submitting ? "Setting up your profile..." : "Get started"}
                 </button>
                 <button
                     onClick={onBack}

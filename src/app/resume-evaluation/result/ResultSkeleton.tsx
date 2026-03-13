@@ -23,9 +23,18 @@ export default function ResultSkeleton() {
     }, []);
 
     return (
-        <div className="flex h-screen bg-[#050810] text-slate-300 font-sans overflow-hidden">
+        <div className="flex h-screen bg-[#0f1629] text-slate-300 font-sans overflow-hidden relative">
+            {/* Subtle background radial dots */}
+            <div
+                className="absolute inset-0 pointer-events-none z-0"
+                style={{
+                    backgroundImage:
+                        "radial-gradient(circle, rgba(103,95,174,0.18) 1px, transparent 1px)",
+                    backgroundSize: "48px 48px",
+                }}
+            />
             {/* Sidebar Skeleton */}
-            <aside className="fixed inset-y-0 left-0 z-50 w-72 border-r border-slate-800/80 bg-[#070b14] flex flex-col lg:flex">
+            <aside className="fixed inset-y-0 left-0 z-50 w-72 border-r border-slate-800/80 bg-[#0a0f1c] flex flex-col lg:flex">
                 <div className="p-6 border-b border-slate-800/50">
                     <div className="h-4 w-24 bg-slate-800 rounded animate-pulse mb-8" />
                     <div className="flex items-center gap-4 mb-8">
@@ -52,7 +61,7 @@ export default function ResultSkeleton() {
                         <div className="h-4 w-96 bg-slate-800/50 rounded animate-pulse mt-4" />
                     </div>
 
-                    <div className="w-full max-w-2xl h-[600px] border border-slate-800/50 bg-[#070b14] rounded-sm flex flex-col items-center justify-center shadow-2xl relative overflow-hidden">
+                    <div className="w-full max-w-2xl h-[600px] border border-slate-800/50 bg-[#0a0f1c] rounded-sm flex flex-col items-center justify-center shadow-2xl relative overflow-hidden">
                         {/* Shimmer Effect */}
                         <div className="absolute inset-0 max-w-full -translate-x-full animate-[shimmer_2s_infinite] bg-linear-to-r from-transparent via-indigo-500/5 to-transparent" />
                         

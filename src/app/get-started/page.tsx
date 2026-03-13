@@ -1,11 +1,35 @@
 import OnboardingShell from "@/components/get-started/OnboardingShell";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 export const metadata = {
     title: "Get Started · ProFile",
     description: "Set up your ProFile account",
 };
 
-export default function GetStarted() {
+export default async function GetStarted() {
+    const supabase = await createClient();
+
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    // Not authenticated → redirect to signin
+    if (!user) {
+        redirect("/signin");
+    }
+
+    // Already has a profile → redirect to dashboard
+    const { data: profile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("id", user.id)
+        .single();
+
+    if (profile) {
+        redirect("/dashboard");
+    }
+
     return (
         /**
          * Full-screen fixed overlay so this page sits above the root layout's

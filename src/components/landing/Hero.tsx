@@ -1,7 +1,50 @@
+"use client";
+
 import { Button } from "@/components/ui/Button";
-import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 export default function Hero() {
+    const router = useRouter();
+
+    async function handleGetStarted() {
+        const supabase = await createClient();
+
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+            // Not authenticated → trigger Google sign-in
+            // The auth callback will handle routing (get-started vs dashboard)
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: "google",
+                options: {
+                    queryParams: {
+                        prompt: "select_account",
+                    },
+                    redirectTo: `${process.env.NEXT_PUBLIC_BACKEND_BASE}/auth/callback`,
+                },
+            });
+
+            if (error) console.error("Sign-in error:", error.message);
+            return;
+        }
+
+        // Authenticated → check if they already have a profile
+        const { data: profile } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("id", user.id)
+            .single();
+
+        if (profile) {
+            router.push("/dashboard");
+        } else {
+            router.push("/get-started");
+        }
+    }
+
     return (
         <section className="hero relative z-10 flex flex-col items-center pt-32 lg:pt-48 w-full min-h-[70vh] justify-center overflow-hidden">
             {/* Background Glow */}
@@ -27,19 +70,18 @@ export default function Hero() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mt-12 w-full hero-animation-delay-2">
-                    <Link
-                        href="/get-started"
-                        className="w-full sm:w-auto"
+                    <Button
+                        onClick={handleGetStarted}
+                        className="w-full sm:w-auto px-8 py-4 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl font-semibold text-lg transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] active:scale-95"
                     >
-                        <Button className="w-full px-8 py-4 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl font-semibold text-lg transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] active:scale-95">
-                            Get Started
-                        </Button>
-                    </Link>
-                    <Link href="/resume-evaluation" className="w-full sm:w-auto">
-                        <Button className="w-full px-8 py-4 bg-slate-800/50 hover:bg-slate-700/50 text-white border border-slate-700 rounded-xl font-semibold text-lg transition-all backdrop-blur-sm active:scale-95">
-                            Check Resume
-                        </Button>
-                    </Link>
+                        Get Started
+                    </Button>
+                    <Button
+                        onClick={() => router.push("/resume-evaluation")}
+                        className="w-full sm:w-auto px-8 py-4 bg-slate-800/50 hover:bg-slate-700/50 text-white border border-slate-700 rounded-xl font-semibold text-lg transition-all backdrop-blur-sm active:scale-95"
+                    >
+                        Check Resume
+                    </Button>
                 </div>
             </div>
             <br />

@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import StepIndicator from "./StepIndicator";
 import AvatarStep from "./AvatarStep";
 import UsernameStep from "./UsernameStep";
 import PathStep, { type UserPath } from "./PathStep";
+import { completeOnboarding } from "@/app/actions/onboarding/completeOnboarding";
 
 type OnboardingData = {
-    avatar: string;
+    avatar: File | null;
     username: string;
     path: UserPath | null;
 };
@@ -16,14 +17,17 @@ type OnboardingData = {
 const STEP_LABELS = ["Avatar", "Username", "Path"];
 
 export default function OnboardingShell() {
+    const router = useRouter();
     const [step, setStep] = useState(1);
     const [direction, setDirection] = useState<"forward" | "back">("forward");
     const [data, setData] = useState<OnboardingData>({
-        avatar: "",
+        avatar: null,
         username: "",
         path: null,
     });
     const [done, setDone] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const goForward = () => {
         setDirection("forward");
@@ -34,16 +38,35 @@ export default function OnboardingShell() {
         setStep((s) => s - 1);
     };
 
-    const handleAvatarDone = (avatar: string) => {
-        setData((d) => ({ ...d, avatar }));
+    const handleAvatarDone = (avatarFile: File | null) => {
+        setData((d) => ({ ...d, avatar: avatarFile }));
         goForward();
     };
     const handleUsernameDone = (username: string) => {
         setData((d) => ({ ...d, username }));
         goForward();
     };
-    const handlePathDone = (path: UserPath) => {
+    const handlePathDone = async (path: UserPath) => {
         setData((d) => ({ ...d, path }));
+        setSubmitting(true);
+        setError(null);
+
+        const formData = new FormData();
+        formData.append("username", data.username);
+        formData.append("path", path);
+        if (data.avatar) {
+            formData.append("avatar", data.avatar);
+        }
+
+        const result = await completeOnboarding(formData);
+
+        if (result.error) {
+            setError(result.error);
+            setSubmitting(false);
+            return;
+        }
+
+        setSubmitting(false);
         setDone(true);
     };
 
@@ -86,12 +109,12 @@ export default function OnboardingShell() {
                         starts now.
                     </p>
                 </div>
-                <Link
-                    href="/"
-                    className="mt-2 px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold rounded-xl transition-colors duration-200"
+                <button
+                    onClick={() => router.push("/dashboard")}
+                    className="mt-2 px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold rounded-xl transition-colors duration-200 cursor-pointer"
                 >
                     Go to Dashboard
-                </Link>
+                </button>
             </div>
         );
     }
@@ -105,6 +128,13 @@ export default function OnboardingShell() {
                 labels={STEP_LABELS}
             />
 
+            {/* Error message */}
+            {error && (
+                <div className="w-full max-w-xs text-center">
+                    <p className="text-red-400 text-sm">{error}</p>
+                </div>
+            )}
+
             {/* Step Content with fade transition */}
             <div
                 key={`${step}-${direction}`}
@@ -115,7 +145,11 @@ export default function OnboardingShell() {
                     <UsernameStep onNext={handleUsernameDone} onBack={goBack} />
                 )}
                 {step === 3 && (
-                    <PathStep onFinish={handlePathDone} onBack={goBack} />
+                    <PathStep
+                        onFinish={handlePathDone}
+                        onBack={goBack}
+                        submitting={submitting}
+                    />
                 )}
             </div>
         </div>

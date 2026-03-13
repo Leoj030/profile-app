@@ -22,7 +22,7 @@ import Link from "next/link";
 // --- Constants ---
 
 const MODULE_DESCRIPTIONS = {
-    "Structure & Oranization":
+    "Structure & Organization":
         "Analyzes the resume's structural integrity to ensure ATS parsers can accurately map your history and contact details.",
     "Language & Mechanics":
         "Polishes grammar and tone, removing linguistic fluff to ensure a professional and impactful narrative.",
@@ -41,9 +41,17 @@ const MODULE_ICONS = {
 
 // --- Sub-components ---
 
+const getScoreStatus = (score: number) => {
+    if (score >= 86) return { text: "Excellent", colorClass: "text-emerald-400" };
+    if (score >= 76) return { text: "Good", colorClass: "text-emerald-400" };
+    if (score >= 70) return { text: "Fair", colorClass: "text-yellow-400" };
+    if (score >= 60) return { text: "Needs Improvement", colorClass: "text-orange-400" };
+    return { text: "Critical", colorClass: "text-red-500" };
+};
+
 const ScoreGaugeMini = ({ score }: { score: number }) => (
-    <div
-        className={`radial-progress text-indigo-500 bg-slate-900 border-2 border-slate-800 shadow-md`}
+        <div
+        className={`radial-progress text-indigo-500 bg-[#0f1629] border-2 border-slate-800 shadow-md`}
         style={
             {
                 "--value": score,
@@ -79,11 +87,11 @@ const AccordionItem = ({
         <div className="border-b border-slate-800/50">
             <button
                 onClick={onToggle}
-                className="w-full flex items-center justify-between p-4 hover:bg-slate-900/40 transition-colors group"
+                className="w-full flex items-center justify-between p-4 hover:bg-slate-950/40 transition-colors group"
             >
                 <div className="flex items-center gap-3">
                     <Icon className="w-4 h-4 text-slate-400 group-hover:text-indigo-400" />
-                    <span className="text-[13px] font-semibold text-slate-300 group-hover:text-white transition-colors">
+                    <span className="text-[15px] font-semibold text-slate-300 group-hover:text-white transition-colors">
                         {title}
                     </span>
                 </div>
@@ -95,14 +103,14 @@ const AccordionItem = ({
             </button>
 
             {isOpen && (
-                <div className="bg-slate-900/20 px-4 pb-4 space-y-1.5 pt-1">
+                <div className="bg-slate-950/20 px-4 pb-4 space-y-1.5 pt-1">
                     {checks.map(([key, result]) => {
                         const checkResult = result as CheckResult;
                         return (
                             <button
                                 key={key}
                                 onClick={() => onScrollTo(key)}
-                                className={`w-full text-left text-[10px] p-2 rounded-md border transition-all hover:translate-x-1 ${
+                                className={`w-full text-left text-[13px] p-2 rounded-md border transition-all hover:translate-x-1 ${
                                     checkResult.passed
                                         ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-400/80 hover:bg-emerald-500/10"
                                         : "border-rose-500/20 bg-rose-500/5 text-rose-400/80 hover:bg-rose-500/10"
@@ -133,7 +141,7 @@ const FeedbackSection = ({
 }) => (
     <div
         ref={scrollRef}
-        className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 mb-6 backdrop-blur-sm animate-fade-in scroll-mt-24"
+        className="bg-slate-950/40 border border-slate-800 rounded-2xl p-6 mb-6 backdrop-blur-sm animate-fade-in scroll-mt-24"
     >
         <div className="flex items-start gap-4 mb-5">
             <div className="mt-1">
@@ -144,13 +152,13 @@ const FeedbackSection = ({
                 )}
             </div>
             <div className="flex-1">
-                <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] block mb-1">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] block mb-1">
                     {moduleTitle} Result
                 </span>
-                <h4 className="text-xl font-bold text-white capitalize tracking-tight mb-2">
+                <h4 className="text-2xl font-bold text-white capitalize tracking-tight mb-2">
                     {name.replace(/_/g, " ")}
                 </h4>
-                <p className="text-slate-400 text-sm leading-relaxed mb-6">
+                <p className="text-slate-400 text-md leading-relaxed mb-6">
                     {result.feedback}
                 </p>
 
@@ -160,7 +168,7 @@ const FeedbackSection = ({
                         result.found_buzzwords ||
                         result.niche_skills_found) && (
                         <div>
-                            <h5 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <h5 className="text-[11px] font-black text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <div className="w-1 h-1 rounded-full bg-indigo-500" />
                                 Context Analysis
                             </h5>
@@ -205,7 +213,7 @@ const FeedbackSection = ({
                         result.suggested_umbrella_terms ||
                         result.corrections_needed) && (
                         <div>
-                            <h5 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <h5 className="text-[12px] font-black text-emerald-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <div className="w-1 h-1 rounded-full bg-emerald-500" />
                                 Growth Roadmap
                             </h5>
@@ -331,7 +339,16 @@ export default function EvaluationView({
     };
 
     return (
-        <div className="flex h-screen bg-[#050810] text-slate-300 font-sans overflow-hidden">
+        <div className="flex h-screen bg-[#0f1629] text-slate-300 font-sans overflow-hidden">
+            {/* Subtle background radial dots */}
+            <div
+                className="absolute inset-0 pointer-events-none z-0"
+                style={{
+                    backgroundImage:
+                        "radial-gradient(circle, rgba(103,95,174,0.18) 1px, transparent 1px)",
+                    backgroundSize: "48px 48px",
+                }}
+            />
             {/* 
                 Structure:
                 - Sidebar: h-full, potentially overflow-y-auto
@@ -350,7 +367,7 @@ export default function EvaluationView({
             {/* Sidebar Navigation */}
             <aside
                 className={`
-                fixed inset-y-0 left-0 z-50 w-72 border-r border-slate-800/80 bg-[#070b14] flex flex-col 
+                fixed inset-y-0 left-0 z-50 w-72 border-r border-slate-800/80 bg-[#0a0f1c] flex flex-col 
                 transition-transform duration-500 ease-out lg:relative lg:translate-x-0
                 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
             `}
@@ -460,7 +477,7 @@ export default function EvaluationView({
 
                     <div className="relative group max-w-full">
                         <div className="absolute -inset-1 bg-linear-to-r from-indigo-500 to-purple-500 rounded-lg blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-                        <div className="relative bg-[#050810] shadow-2xl rounded-sm overflow-hidden transform transition-all duration-700 hover:scale-[1.01] origin-top max-w-full border border-slate-800/50 flex flex-col items-center">
+                        <div className="relative bg-[#0a0f1c] shadow-2xl rounded-sm overflow-hidden transform transition-all duration-700 hover:scale-[1.01] origin-top max-w-full border border-slate-800/50 flex flex-col items-center">
                             <Document
                                 file={pdfUrl}
                                 className="flex flex-col items-center"
@@ -524,21 +541,18 @@ export default function EvaluationView({
                                                     {moduleName}
                                                 </h3>
                                                 <div className="flex items-center gap-2 mt-1">
-                                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                                    <span className="text-[12px] font-black text-slate-500 uppercase tracking-widest">
                                                         Section Status:
                                                     </span>
                                                     <span
-                                                        className={`text-[10px] font-bold uppercase ${moduleData.module_score >= 80 ? "text-emerald-400" : "text-amber-400"}`}
+                                                        className={`text-[12px] font-bold uppercase ${getScoreStatus(moduleData.module_score).colorClass}`}
                                                     >
-                                                        {moduleData.module_score >=
-                                                        80
-                                                            ? "Optimized"
-                                                            : "Warning"}
+                                                        {getScoreStatus(moduleData.module_score).text}
                                                     </span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <p className="text-sm text-slate-400 font-medium leading-relaxed bg-slate-900/40 p-5 rounded-2xl border border-slate-800/30">
+                                        <p className="text-md text-slate-400 font-medium leading-relaxed bg-slate-950/40 p-5 rounded-2xl border border-slate-800/30">
                                             {description}
                                         </p>
                                     </div>
@@ -546,7 +560,7 @@ export default function EvaluationView({
                                         <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">
                                             Internal Score
                                         </span>
-                                        <div className="px-6 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-2xl font-black text-indigo-400 shadow-xl shadow-indigo-500/5">
+                                        <div className="px-6 py-3 bg-[#0a0f1c] border border-slate-800 rounded-2xl text-2xl font-black text-indigo-400 shadow-xl shadow-indigo-500/5">
                                             {moduleData.module_score}
                                             <span className="text-[10px] text-slate-600 ml-1">
                                                 /100

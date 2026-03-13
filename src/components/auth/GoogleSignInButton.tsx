@@ -21,9 +21,12 @@ export function GoogleSignInButton() {
         if (error) throw new Error(error.message);
     };
     return (
-        <Button className="btn btn-primary btn-wide" onClick={signInWithGoogle}>
-            <LogosGoogleIcon className="w-4 h-4"/>
-            Signin with Google
+        <Button 
+            className="w-full h-12 flex items-center justify-center gap-3 bg-[#ffffff] hover:bg-slate-100 text-slate-800 rounded-xl font-semibold shadow-md active:scale-[0.98] transition-all border border-slate-200" 
+            onClick={signInWithGoogle}
+        >
+            <LogosGoogleIcon className="w-5 h-5"/>
+            Sign in with Google
         </Button>
     );
 }

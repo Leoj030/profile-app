@@ -4,24 +4,24 @@ import { useState, useRef } from "react";
 import { User, Camera, ImagePlus } from "lucide-react";
 
 interface AvatarStepProps {
-    onNext: (avatarUrl: string) => void;
+    onNext: (avatarFile: File | null) => void;
 }
 
 export default function AvatarStep({ onNext }: AvatarStepProps) {
-    const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         const url = URL.createObjectURL(file);
-        setUploadedUrl(url);
+        setPreviewUrl(url);
+        setSelectedFile(file);
     };
 
     const handleNext = () => {
-        // If no upload, we pass an empty string or a default value
-        // The user can proceed with the default icon
-        onNext(uploadedUrl || "default");
+        onNext(selectedFile);
     };
 
     return (
@@ -53,13 +53,13 @@ export default function AvatarStep({ onNext }: AvatarStepProps) {
                         flex items-center justify-center cursor-pointer overflow-hidden
                         transition-all duration-300 group-hover:border-purple-500/50 
                         bg-white/5 relative
-                        ${uploadedUrl ? "border-solid border-purple-500/30" : "hover:bg-white/10"}
+                        ${previewUrl ? "border-solid border-purple-500/30" : "hover:bg-white/10"}
                     `}
                 >
-                    {uploadedUrl ? (
+                    {previewUrl ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img
-                            src={uploadedUrl}
+                            src={previewUrl}
                             alt="Preview"
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
@@ -76,7 +76,7 @@ export default function AvatarStep({ onNext }: AvatarStepProps) {
                 </div>
 
                 {/* Status Badge */}
-                {uploadedUrl && (
+                {previewUrl && (
                     <div className="absolute -bottom-1 -right-1 p-2 bg-purple-600 rounded-full shadow-lg border-2 border-[#0f1629]">
                         <ImagePlus className="w-4 h-4 text-white" />
                     </div>
@@ -85,7 +85,7 @@ export default function AvatarStep({ onNext }: AvatarStepProps) {
 
             <div className="flex flex-col items-center gap-4 w-full max-w-xs">
                 {/* Upload Button Alternative */}
-                {!uploadedUrl && (
+                {!previewUrl && (
                     <button
                         onClick={() => fileRef.current?.click()}
                         className="text-sm text-purple-400 hover:text-purple-300 font-medium transition-colors"

@@ -37,16 +37,11 @@ export default async function evaluateResume(formData: FormData) {
         aiAnalysis(imgUrl, module4),
     ]);
 
-    console.log(result1);
-    console.log(result2);
-    console.log(result3);
-    console.log(result4);
-
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (user) {
-        return await post({
+        const resultId = await post({
             owner_id: user.id,
             result: {
                 module1: result1,
@@ -56,6 +51,27 @@ export default async function evaluateResume(formData: FormData) {
             },
             reference_id: pathName
         }, "authenticated_results");
+
+        // Fetch the user's profile to get the current eval_results array
+        const { data: profileData, error: profileError } = await supabase
+            .from("profiles")
+            .select("eval_results")
+            .eq("id", user.id)
+            .single();
+
+        if (!profileError && profileData) {
+            const currentResults = profileData.eval_results || [];
+            
+            // Append the new resultId to the array and update the profile
+            await supabase
+                .from("profiles")
+                .update({ eval_results: [...currentResults, resultId] })
+                .eq("id", user.id);
+        } else if (profileError) {
+            console.error("Error fetching profile for eval_results update:", profileError);
+        }
+
+        return resultId;
     }
     else {
         return await post({

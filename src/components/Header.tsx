@@ -8,10 +8,11 @@ import { usePathname } from "next/navigation";
 export default function Header() {
     const pathname = usePathname();
 
-    // Hide header on resume evaluation results pages
+    // Hide header on dashboard and resume evaluation results pages
+    const isDashboard = pathname?.startsWith("/dashboard");
     const isEvaluationResult = pathname?.includes("/resume-evaluation/");
 
-    if (isEvaluationResult) return null;
+    if (isDashboard || isEvaluationResult) return null;
 
     return (
         <header className="w-full h-20 fixed top-0 left-0 bg-slate-950/20 flex justify-center items-center px-6 backdrop-blur-md border-b border-slate-800/50 z-50">
