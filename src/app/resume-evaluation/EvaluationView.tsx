@@ -166,7 +166,8 @@ const FeedbackSection = ({
                     {(result.weak_verbs_found ||
                         result.found_pronouns ||
                         result.found_buzzwords ||
-                        result.niche_skills_found) && (
+                        result.niche_skills_found ||
+                        result.third_person_phrases) && (
                         <div>
                             <h5 className="text-[11px] font-black text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <div className="w-1 h-1 rounded-full bg-indigo-500" />
@@ -201,6 +202,14 @@ const FeedbackSection = ({
                                     <span
                                         key={v}
                                         className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold"
+                                    >
+                                        {v}
+                                    </span>
+                                ))}
+                                {result.third_person_phrases?.map((v: string) => (
+                                    <span
+                                        key={v}
+                                        className="px-2.5 py-1 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-bold"
                                     >
                                         {v}
                                     </span>

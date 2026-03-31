@@ -4,8 +4,8 @@ import path from "path";
 import getFile from "@/lib/supabase/getFile";
 import uploadFile from "@/lib/supabase/uploadFile";
 import toImg from "@/lib/evaluate/toImg";
-import { aiAnalysis } from "@/lib/evaluate/aiAnalysis";
-import { module1, module2, module3, module4 } from "@/lib/evaluate/prompts";
+import { extractTextToJson, aiAnalysis, aiAnalysis2 } from "@/lib/evaluate/aiAnalysis";
+import { extractTextPrompt, module1, module2, module3, module4 } from "@/lib/evaluate/prompts";
 import post from "@/lib/supabase/post";
 import { createClient } from "@/lib/supabase/server";
 
@@ -30,11 +30,13 @@ export default async function evaluateResume(formData: FormData) {
 
     const imgUrl = await getFile("ResumeIMG", pathName);
 
+    const textContent = await extractTextToJson(imgUrl, extractTextPrompt);
+
     const [result1, result2, result3, result4] = await Promise.all([
-        aiAnalysis(imgUrl, module1),
-        aiAnalysis(imgUrl, module2),
-        aiAnalysis(imgUrl, module3),
-        aiAnalysis(imgUrl, module4),
+        aiAnalysis2(imgUrl, module1),
+        aiAnalysis(textContent, module2),
+        aiAnalysis(textContent, module3),
+        aiAnalysis(textContent, module4),
     ]);
 
     const supabase = await createClient();

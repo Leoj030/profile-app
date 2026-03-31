@@ -10,6 +10,7 @@ export interface CheckResult {
     suggested_umbrella_terms?: string[];
     missing?: string[];
     is_fresh_grad?: boolean;
+    third_person_phrases?: string[];
 }
 
 export interface ModuleData {
