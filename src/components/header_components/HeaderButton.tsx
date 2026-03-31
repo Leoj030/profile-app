@@ -4,11 +4,13 @@ import { Button } from "../ui/Button";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { type User } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 
 export default function HeaderButton() {
     const router = useRouter();
+    const pathname = usePathname();
+    const isJobPostPage = pathname?.startsWith("/job-post");
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<{ display_name?: string } | null>(null);
     const [loading, setLoading] = useState(true);
@@ -152,12 +154,14 @@ export default function HeaderButton() {
                     Sign In
                 </Button>
             </Link>
-            <Button 
-                onClick={handleGetStarted}
-                className="px-6 py-2.5 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl font-bold shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:shadow-[0_0_20px_rgba(79,70,229,0.5)] active:scale-95 transition-all"
-            >
-                Get Started
-            </Button>
+            {!isJobPostPage && (
+                <Button 
+                    onClick={handleGetStarted}
+                    className="px-6 py-2.5 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl font-bold shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:shadow-[0_0_20px_rgba(79,70,229,0.5)] active:scale-95 transition-all"
+                >
+                    Get Started
+                </Button>
+            )}
         </section>
     );
 }

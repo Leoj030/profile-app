@@ -11,6 +11,7 @@ export default function Header() {
     // Hide header on dashboard and resume evaluation results pages
     const isDashboard = pathname?.startsWith("/dashboard");
     const isEvaluationResult = pathname?.includes("/resume-evaluation/");
+    const isJobPostPage = pathname?.startsWith("/job-post");
 
     if (isDashboard || isEvaluationResult) return null;
 
@@ -28,37 +29,39 @@ export default function Header() {
                     </Link>
                 </section>
 
-                <nav className="hidden lg:block">
-                    <ul className="flex items-center gap-1 font-medium text-slate-300">
-                        <li>
-                            <Link
-                                href={"#features"}
-                                className="px-5 py-2 rounded-full hover:text-white hover:bg-white/5 transition-all duration-300 ease-in-out"
-                            >
-                                Features
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                href={"/how-it-works"}
-                                className="px-5 py-2 rounded-full hover:text-white hover:bg-white/5 transition-all duration-300 ease-in-out"
-                            >
-                                How It Works
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                href={"/pricing"}
-                                className="px-5 py-2 rounded-full hover:text-white hover:bg-white/5 transition-all duration-300 ease-in-out"
-                            >
-                                Pricing
-                            </Link>
-                        </li>
-                    </ul>
-                </nav>
+                {!isJobPostPage && (
+                    <nav className="hidden lg:block">
+                        <ul className="flex items-center gap-1 font-medium text-slate-300">
+                            <li>
+                                <Link
+                                    href={"#features"}
+                                    className="px-5 py-2 rounded-full hover:text-white hover:bg-white/5 transition-all duration-300 ease-in-out"
+                                >
+                                    Features
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href={"/how-it-works"}
+                                    className="px-5 py-2 rounded-full hover:text-white hover:bg-white/5 transition-all duration-300 ease-in-out"
+                                >
+                                    How It Works
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href={"/pricing"}
+                                    className="px-5 py-2 rounded-full hover:text-white hover:bg-white/5 transition-all duration-300 ease-in-out"
+                                >
+                                    Pricing
+                                </Link>
+                            </li>
+                        </ul>
+                    </nav>
+                )}
 
                 <section className="flex items-center gap-4">
-                    <Hamburger color="bg-slate-200" />
+                    {!isJobPostPage && <Hamburger color="bg-slate-200" />}
                     <HeaderButton />
                 </section>
             </div>

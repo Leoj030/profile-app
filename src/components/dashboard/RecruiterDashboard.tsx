@@ -4,126 +4,124 @@ import {
     DownloadIcon,
     DotsVerticalIcon,
 } from "@radix-ui/react-icons";
+import { createClient } from "@/lib/supabase/server";
 
-// --- Mock Data ---
-
-const MOCK_STATS = [
-    {
-        label: "Active Jobs",
-        value: "12",
-        sub: "+2 this week",
-        subColor: "text-emerald-400",
-        iconBg: "bg-blue-500/20",
-        icon: (
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <rect x="3" y="5" width="14" height="12" rx="2" stroke="#60a5fa" strokeWidth="1.5" />
-                <path d="M7 5V3a3 3 0 0 1 6 0v2" stroke="#60a5fa" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-        ),
-    },
-    {
-        label: "Total Applicants",
-        value: "247",
-        sub: "+34 this week",
-        subColor: "text-emerald-400",
-        iconBg: "bg-orange-500/20",
-        icon: (
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <circle cx="7" cy="7" r="3.5" stroke="#fb923c" strokeWidth="1.5" />
-                <circle cx="14" cy="7" r="3.5" stroke="#fb923c" strokeWidth="1.5" />
-                <path d="M1 17c0-3 2.5-5 6-5m6 5c0-3 2.5-5 6-5" stroke="#fb923c" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-        ),
-    },
-    {
-        label: "Avg. Match Score",
-        value: "84%",
-        sub: "+5% from last month",
-        subColor: "text-emerald-400",
-        iconBg: "bg-emerald-500/20",
-        icon: (
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M2 14l4-4 4 4 8-10" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-        ),
-    },
-    {
-        label: "Time to Hire",
-        value: "14 days",
-        sub: "-3 days improved",
-        subColor: "text-emerald-400",
-        iconBg: "bg-orange-500/20",
-        icon: (
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <circle cx="10" cy="10" r="8" stroke="#fb923c" strokeWidth="1.5" />
-                <path d="M10 5v5l3 3" stroke="#fb923c" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-        ),
-    },
-];
-
-const MOCK_APPLICANTS = [
-    {
-        id: "1",
-        name: "Sarah Johnson",
-        initials: "SJ",
-        color: "bg-emerald-500",
-        starred: true,
-        role: "Senior Software Engineer",
-        experience: "8 years experience",
-        applied: "Applied 2025-10-15",
-        matchScore: 92,
-        status: "Shortlisted",
-        statusColor: "text-emerald-400",
-    },
-    {
-        id: "2",
-        name: "Michael Chen",
-        initials: "MC",
-        color: "bg-purple-500",
-        starred: true,
-        role: "Senior Software Engineer",
-        experience: "6 years experience",
-        applied: "Applied 2025-10-14",
-        matchScore: 88,
-        status: "Reviewing",
-        statusColor: "text-yellow-400",
-    },
-    {
-        id: "3",
-        name: "Emily Rodriguez",
-        initials: "ER",
-        color: "bg-pink-500",
-        starred: false,
-        role: "Product Manager",
-        experience: "5 years experience",
-        applied: "Applied 2025-10-13",
-        matchScore: 85,
-        status: "Reviewing",
-        statusColor: "text-yellow-400",
-    },
-    {
-        id: "4",
-        name: "David Kim",
-        initials: "DK",
-        color: "bg-blue-500",
-        starred: false,
-        role: "Frontend Developer",
-        experience: "4 years experience",
-        applied: "Applied 2025-10-12",
-        matchScore: 78,
-        status: "New",
-        statusColor: "text-blue-400",
-    },
-];
-
-function getMatchBadge(score: number) {
+function getMatchBadge(score: number | null) {
+    if (score === null) return "bg-slate-500/20 text-slate-400 border-slate-500/30";
     if (score >= 85) return "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
     if (score >= 70) return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
     return "bg-rose-500/20 text-rose-400 border-rose-500/30";
 }
 
-export default function RecruiterDashboard() {
+function getInitials(name: string) {
+    if (!name) return "??";
+    const parts = name.split(" ");
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return name.substring(0, 2).toUpperCase();
+}
+
+const COLORS = [
+    "bg-emerald-500",
+    "bg-purple-500",
+    "bg-pink-500",
+    "bg-blue-500",
+    "bg-orange-500",
+    "bg-indigo-500",
+];
+
+export default async function RecruiterDashboard() {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Fetch user's jobs
+    const { data: jobs } = await supabase
+        .from("job_posts")
+        .select("id, status")
+        .eq("recruiter_id", user?.id);
+
+    const activeJobsCount = jobs?.filter(j => j.status === 'active' || j.status === 'published').length || jobs?.length || 0;
+    const jobIds = jobs?.map(j => j.id) || [];
+
+    // Fetch applicants for these jobs
+    let applicantsData: any[] = [];
+    if (jobIds.length > 0) {
+        const { data: apps } = await supabase
+            .from("job_applications")
+            .select(`
+                id,
+                full_name,
+                current_position,
+                years_experience,
+                created_at,
+                job_post_id,
+                status,
+                job_posts !inner (
+                    title
+                )
+            `)
+            .in("job_post_id", jobIds)
+            .order("created_at", { ascending: false });
+        
+        applicantsData = apps || [];
+    }
+
+    const STATS = [
+        {
+            label: "Active Jobs",
+            value: activeJobsCount.toString(),
+            sub: "Currently open",
+            subColor: "text-emerald-400",
+            iconBg: "bg-blue-500/20",
+            icon: (
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <rect x="3" y="5" width="14" height="12" rx="2" stroke="#60a5fa" strokeWidth="1.5" />
+                    <path d="M7 5V3a3 3 0 0 1 6 0v2" stroke="#60a5fa" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+            ),
+        },
+        {
+            label: "Total Applicants",
+            value: applicantsData.length.toString(),
+            sub: "Across all jobs",
+            subColor: "text-emerald-400",
+            iconBg: "bg-orange-500/20",
+            icon: (
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="7" cy="7" r="3.5" stroke="#fb923c" strokeWidth="1.5" />
+                    <circle cx="14" cy="7" r="3.5" stroke="#fb923c" strokeWidth="1.5" />
+                    <path d="M1 17c0-3 2.5-5 6-5m6 5c0-3 2.5-5 6-5" stroke="#fb923c" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+            ),
+        },
+        {
+            label: "Avg. Match Score",
+            value: "N/A",
+            sub: "Pending evaluation integration",
+            subColor: "text-slate-500",
+            iconBg: "bg-emerald-500/20",
+            icon: (
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M2 14l4-4 4 4 8-10" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            ),
+        },
+        {
+            label: "Avg. Experience",
+            value: applicantsData.length > 0 
+                ? (applicantsData.reduce((acc, a) => acc + (a.years_experience || 0), 0) / applicantsData.length).toFixed(1) + " yrs"
+                : "0 yrs",
+            sub: "Candidate pool",
+            subColor: "text-indigo-400",
+            iconBg: "bg-indigo-500/20",
+            icon: (
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="8" stroke="#818cf8" strokeWidth="1.5" />
+                    <path d="M10 5v5l3 3" stroke="#818cf8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            ),
+        },
+    ];
+
     return (
         <>
             {/* Header row */}
@@ -137,7 +135,7 @@ export default function RecruiterDashboard() {
                     </p>
                 </div>
                 <Link
-                    href="#"
+                    href="/dashboard/post-job"
                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-sm transition-all shadow-lg shadow-purple-500/10 active:scale-[0.98]"
                 >
                     <svg width="14" height="14" viewBox="0 0 15 15" fill="none">
@@ -149,7 +147,7 @@ export default function RecruiterDashboard() {
 
             {/* Stat Cards */}
             <section className="mb-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {MOCK_STATS.map((stat) => (
+                {STATS.map((stat) => (
                     <div
                         key={stat.label}
                         className="bg-slate-900/60 border border-slate-800/50 rounded-2xl p-5 backdrop-blur-sm"
@@ -166,7 +164,7 @@ export default function RecruiterDashboard() {
                 ))}
             </section>
 
-            {/* Tab labels (static, mock) */}
+            {/* Tab labels */}
             <section className="mb-6">
                 <div className="flex items-center gap-1">
                     <span className="px-4 py-1.5 rounded-lg bg-indigo-600/20 text-indigo-400 text-xs font-bold border border-indigo-500/30">
@@ -209,80 +207,80 @@ export default function RecruiterDashboard() {
                                 />
                             </div>
                         </div>
-                        <select className="px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/50 text-sm text-slate-400 focus:outline-none appearance-none cursor-pointer">
-                            <option>All Status</option>
-                            <option>Shortlisted</option>
-                            <option>Reviewing</option>
-                            <option>New</option>
-                        </select>
-                        <select className="px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/50 text-sm text-slate-400 focus:outline-none appearance-none cursor-pointer">
-                            <option>All Jobs</option>
-                            <option>Software Engineer</option>
-                            <option>Product Manager</option>
-                        </select>
                     </div>
 
                     {/* Applicant Rows */}
-                    {MOCK_APPLICANTS.map((applicant, index) => (
-                        <div
-                            key={applicant.id}
-                            className={`flex items-center gap-4 px-6 py-4 hover:bg-slate-800/30 transition-colors ${
-                                index !== MOCK_APPLICANTS.length - 1
-                                    ? "border-b border-slate-800/40"
-                                    : ""
-                            }`}
-                        >
-                            {/* Avatar */}
-                            <div
-                                className={`w-10 h-10 rounded-full ${applicant.color} flex items-center justify-center text-white text-sm font-bold shrink-0`}
-                            >
-                                {applicant.initials}
-                            </div>
-
-                            {/* Name + Info */}
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                    <p className="text-sm font-semibold text-white">
-                                        {applicant.name}
-                                    </p>
-                                    {applicant.starred && (
-                                        <svg width="12" height="12" viewBox="0 0 15 15" fill="#eab308">
-                                            <path d="M7.22303 0.665992C7.32551 0.419604 7.67454 0.419604 7.77702 0.665992L9.41343 4.60039C9.45665 4.70426 9.55439 4.77523 9.66628 4.78422L13.914 5.12475C14.18 5.14607 14.2878 5.47802 14.0852 5.65162L10.849 8.42374C10.7636 8.49692 10.7263 8.61176 10.7524 8.72118L11.7411 12.8137C11.8039 13.0729 11.5243 13.2764 11.2975 13.14L7.6564 10.9586C7.55905 10.9002 7.441 10.9002 7.34365 10.9586L3.70252 13.14C3.47573 13.2764 3.19612 13.0729 3.2589 12.8137L4.2476 8.72118C4.27369 8.61176 4.23642 8.49692 4.15105 8.42374L0.914787 5.65162C0.712228 5.47802 0.820086 5.14607 1.08608 5.12475L5.33377 4.78422C5.44566 4.77523 5.5434 4.70426 5.58662 4.60039L7.22303 0.665992Z" />
-                                        </svg>
-                                    )}
-                                </div>
-                                <p className="text-xs text-slate-500 mt-0.5">
-                                    {applicant.role}
-                                </p>
-                                <p className="text-[11px] text-slate-600 mt-0.5">
-                                    {applicant.experience} · {applicant.applied}
-                                </p>
-                            </div>
-
-                            {/* Match Score + Status */}
-                            <div className="flex flex-col items-end gap-1 shrink-0">
-                                <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-bold border ${getMatchBadge(applicant.matchScore)}`}>
-                                    Match: {applicant.matchScore}%
-                                </span>
-                                <span className={`text-[11px] font-medium ${applicant.statusColor}`}>
-                                    {applicant.status}
-                                </span>
-                            </div>
-
-                            {/* Action Icons */}
-                            <div className="flex items-center gap-2 shrink-0 ml-2">
-                                <button className="p-1.5 text-slate-500 hover:text-indigo-400 transition-colors">
-                                    <EyeOpenIcon className="w-3.5 h-3.5" />
-                                </button>
-                                <button className="p-1.5 text-slate-500 hover:text-indigo-400 transition-colors">
-                                    <DownloadIcon className="w-3.5 h-3.5" />
-                                </button>
-                                <button className="p-1.5 text-slate-500 hover:text-slate-300 transition-colors">
-                                    <DotsVerticalIcon className="w-3.5 h-3.5" />
-                                </button>
-                            </div>
+                    {applicantsData.length === 0 ? (
+                        <div className="p-8 text-center text-slate-500 text-sm">
+                            No applicants found yet. Create more jobs to attract candidates!
                         </div>
-                    ))}
+                    ) : (
+                        applicantsData.map((applicant, index) => {
+                            const dateApplied = new Date(applicant.created_at).toLocaleDateString();
+                            const jobTitle = applicant.job_posts?.title || "Unknown Job";
+                            const colorClass = COLORS[index % COLORS.length];
+
+                            return (
+                                <div
+                                    key={applicant.id}
+                                    className={`flex items-center gap-4 px-6 py-4 hover:bg-slate-800/30 transition-colors ${
+                                        index !== applicantsData.length - 1
+                                            ? "border-b border-slate-800/40"
+                                            : ""
+                                    }`}
+                                >
+                                    {/* Avatar */}
+                                    <div
+                                        className={`w-10 h-10 rounded-full ${colorClass} flex items-center justify-center text-white text-sm font-bold shrink-0`}
+                                    >
+                                        {getInitials(applicant.full_name)}
+                                    </div>
+
+                                    {/* Name + Info */}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-sm font-semibold text-white">
+                                                {applicant.full_name}
+                                            </p>
+                                        </div>
+                                        <p className="text-xs text-slate-500 mt-0.5 truncate">
+                                            {applicant.current_position || "No role specified"} · Applying for: <span className="text-indigo-400">{jobTitle}</span>
+                                        </p>
+                                        <p className="text-[11px] text-slate-600 mt-0.5">
+                                            {applicant.years_experience ? `${applicant.years_experience} years experience` : "Entry level"} · Applied {dateApplied}
+                                        </p>
+                                    </div>
+
+                                    {/* Match Score + Status */}
+                                    <div className="flex flex-col items-end gap-1 shrink-0">
+                                        <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-bold border ${getMatchBadge(applicant.match_score)}`}>
+                                            {applicant.match_score ? `Match: ${applicant.match_score}%` : "Match: Pending"}
+                                        </span>
+                                        <span className={`text-[11px] font-medium ${applicant.status === 'shortlisted' ? 'text-emerald-400' : 'text-blue-400'}`}>
+                                            {applicant.status || "New"}
+                                        </span>
+                                    </div>
+
+                                    {/* Action Icons */}
+                                    <div className="flex items-center gap-2 shrink-0 ml-2">
+                                        <Link 
+                                            href={`/dashboard/applications/${applicant.id}`}
+                                            className="p-1.5 text-slate-500 hover:text-indigo-400 transition-colors"
+                                            title="View Application"
+                                        >
+                                            <EyeOpenIcon className="w-3.5 h-3.5" />
+                                        </Link>
+                                        <button className="p-1.5 text-slate-500 hover:text-indigo-400 transition-colors">
+                                            <DownloadIcon className="w-3.5 h-3.5" />
+                                        </button>
+                                        <button className="p-1.5 text-slate-500 hover:text-slate-300 transition-colors">
+                                            <DotsVerticalIcon className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
                 </div>
             </section>
         </>
