@@ -80,7 +80,7 @@ const AccordionItem = ({
     onScrollTo: (key: string) => void;
 }) => {
     const checks = Object.entries(data).filter(
-        ([key]) => key !== "module_score",
+        ([key]) => key !== "module_score" && key !== "reasoning",
     );
 
     return (
@@ -554,9 +554,9 @@ export default function EvaluationView({
                                                         Section Status:
                                                     </span>
                                                     <span
-                                                        className={`text-[12px] font-bold uppercase ${getScoreStatus(moduleData.module_score).colorClass}`}
+                                                        className={`text-[12px] font-bold uppercase ${getScoreStatus(moduleData.module_score as number).colorClass}`}
                                                     >
-                                                        {getScoreStatus(moduleData.module_score).text}
+                                                        {getScoreStatus(moduleData.module_score as number).text}
                                                     </span>
                                                 </div>
                                             </div>
@@ -564,13 +564,24 @@ export default function EvaluationView({
                                         <p className="text-md text-slate-400 font-medium leading-relaxed bg-slate-950/40 p-5 rounded-2xl border border-slate-800/30">
                                             {description}
                                         </p>
+                                        {moduleData.reasoning && (
+                                            <div className="mt-4 p-4 border border-indigo-500/20 bg-indigo-500/5 rounded-xl">
+                                                <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                                                    <LightningBoltIcon className="w-3 h-3" />
+                                                    AI Reasoning
+                                                </h4>
+                                                <p className="text-sm text-slate-300 leading-relaxed">
+                                                    {moduleData.reasoning}
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="flex flex-col items-center sm:items-end gap-2">
                                         <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">
                                             Internal Score
                                         </span>
                                         <div className="px-6 py-3 bg-[#0a0f1c] border border-slate-800 rounded-2xl text-2xl font-black text-indigo-400 shadow-xl shadow-indigo-500/5">
-                                            {moduleData.module_score}
+                                            {moduleData.module_score as number}
                                             <span className="text-[10px] text-slate-600 ml-1">
                                                 /100
                                             </span>
@@ -582,10 +593,10 @@ export default function EvaluationView({
                                     {Object.entries(
                                         moduleData as Record<
                                             string,
-                                            CheckResult | number
+                                            CheckResult | number | string | undefined
                                         >,
                                     ).map(([key, result]) => {
-                                        if (key === "module_score") return null;
+                                        if (key === "module_score" || key === "reasoning") return null;
                                         return (
                                             <FeedbackSection
                                                 key={key}

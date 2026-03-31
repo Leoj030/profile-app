@@ -15,7 +15,8 @@ export interface CheckResult {
 
 export interface ModuleData {
     module_score: number;
-    [key: string]: number | CheckResult;
+    reasoning?: string;
+    [key: string]: number | string | CheckResult | undefined;
 }
 
 export interface EvaluationData {

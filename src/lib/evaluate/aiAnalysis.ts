@@ -1,9 +1,8 @@
 import { Groq } from "groq-sdk";
-import { extractTextPrompt } from "./prompts";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-const GPT_MODEL = "openai/gpt-oss-120b";
+const GPT_MODEL = "llama-3.3-70b-versatile";
 const LLAMA_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
 
 export async function extractTextToJson(imgUrl: string, prompt: string) {
