@@ -83,7 +83,7 @@ export default async function ApplicationDetailsPage({
     }
 
     return (
-        <div className="min-h-screen bg-[#0f1629] text-slate-300 font-sans pt-32 pb-20">
+        <div className="min-h-screen bg-[#1a2340] text-slate-300 font-sans pt-32 pb-20">
             {/* Ambient Background Grid */}
             <div
                 className="fixed inset-0 pointer-events-none z-0"
@@ -106,7 +106,7 @@ export default async function ApplicationDetailsPage({
                 </Link>
 
                 {/* Profile Header */}
-                <div className="bg-slate-900/60 border border-slate-800/50 rounded-3xl p-8 backdrop-blur-sm shadow-2xl mb-6">
+                <div className="bg-slate-800/50 border border-slate-700/50 rounded-3xl p-8 backdrop-blur-sm shadow-2xl mb-6">
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                         
                         <div className="flex items-center gap-6">
@@ -157,7 +157,7 @@ export default async function ApplicationDetailsPage({
                     {/* Left Column - Contact & Fast Facts */}
                     <div className="space-y-6">
                         {/* Contact Info */}
-                        <div className="bg-slate-900/60 border border-slate-800/50 rounded-2xl p-6 backdrop-blur-sm">
+                        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 backdrop-blur-sm">
                             <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-5 flex items-center gap-2">
                                 <IdCardIcon className="w-4 h-4 text-indigo-400" />
                                 Contact Details
@@ -207,7 +207,7 @@ export default async function ApplicationDetailsPage({
                         </div>
 
                         {/* Fast Facts */}
-                        <div className="bg-slate-900/60 border border-slate-800/50 rounded-2xl p-6 backdrop-blur-sm">
+                        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 backdrop-blur-sm">
                             <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-5 flex items-center gap-2">
                                 <BackpackIcon className="w-4 h-4 text-indigo-400" />
                                 Application Data
@@ -235,7 +235,7 @@ export default async function ApplicationDetailsPage({
 
                     {/* Right Column - Cover Letter */}
                     <div className="md:col-span-2">
-                        <div className="bg-slate-900/60 border border-slate-800/50 rounded-2xl p-8 backdrop-blur-sm h-full">
+                        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8 backdrop-blur-sm h-full">
                             <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-6 flex items-center gap-2 pb-4 border-b border-slate-800/60">
                                 <EnvelopeClosedIcon className="w-4 h-4 text-indigo-400" />
                                 Cover Letter / Additional Info

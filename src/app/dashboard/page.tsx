@@ -19,7 +19,7 @@ export default async function DashboardPage() {
     // Recruiter dashboard (mock data for now)
     if (roleId === 2) {
         return (
-            <div className="min-h-screen bg-[#0f1629] text-slate-300 font-sans pt-32 pb-20">
+            <div className="min-h-screen bg-[#1a2340] text-slate-300 font-sans pt-32 pb-20">
                 <div
                     className="fixed inset-0 pointer-events-none z-0"
                     style={{
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#0f1629] text-slate-300 font-sans pt-32 pb-20">
+        <div className="min-h-screen bg-[#1a2340] text-slate-300 font-sans pt-32 pb-20">
             <div
                 className="fixed inset-0 pointer-events-none z-0"
                 style={{

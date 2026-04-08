@@ -11,19 +11,25 @@ export default async function DashboardLayout({
     const user = await getCurrentUser();
     const supabase = await createClient();
 
-    const displayName =
-        user.user_metadata?.full_name ||
-        user.user_metadata?.name ||
-        user.email ||
-        "User";
-
-    // Fetch profile pic reference
+    // Fetch username and profile pic reference
     let avatarUrl: string | undefined;
+    let displayName = "User";
+
     const { data: profile } = await supabase
         .from("profiles")
-        .select("profile_pic_reference")
+        .select("username, profile_pic_reference")
         .eq("id", user.id)
         .single();
+
+    if (profile?.username) {
+        displayName = profile.username;
+    } else {
+        displayName =
+            user.user_metadata?.full_name ||
+            user.user_metadata?.name ||
+            user.email?.split("@")[0] ||
+            "User";
+    }
 
     if (profile?.profile_pic_reference) {
         try {

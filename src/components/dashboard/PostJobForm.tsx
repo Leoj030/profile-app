@@ -3,6 +3,25 @@
 import { useState, useRef, KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createJobPost } from "@/app/actions/jobs/createJobPost";
+import { updateJobPost } from "@/app/actions/jobs/updateJobPost";
+
+interface JobPostData {
+    id?: string;
+    title: string;
+    company: string;
+    location: string;
+    job_type: string;
+    experience_level: string;
+    salary_currency: string;
+    salary_min: number | null;
+    salary_max: number | null;
+    description: string;
+    requirements: string;
+    nice_to_have: string | null;
+    application_deadline: string | null;
+    skills: string[];
+    status: string;
+}
 
 const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Internship", "Remote"];
 const EXPERIENCE_LEVELS = ["Entry", "Mid", "Senior", "Lead", "Executive"];
@@ -10,7 +29,7 @@ const CURRENCIES = ["USD", "PHP", "EUR", "GBP", "SGD", "AUD"];
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
     return (
-        <div className="bg-slate-900/60 border border-slate-800/50 rounded-2xl p-6 backdrop-blur-sm">
+        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 backdrop-blur-sm">
             <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-5">{title}</h2>
             {children}
         </div>
@@ -35,15 +54,17 @@ const selectClass =
 const textareaClass =
     "w-full px-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700/50 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all resize-none leading-relaxed";
 
-export default function PostJobForm() {
+export default function PostJobForm({ job }: { job?: JobPostData }) {
     const router = useRouter();
     const formRef = useRef<HTMLFormElement>(null);
 
-    const [skills, setSkills] = useState<string[]>([]);
+    const [skills, setSkills] = useState<string[]>(job?.skills || []);
     const [skillInput, setSkillInput] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitStatus, setSubmitStatus] = useState<"draft" | "active">("draft");
+    const [submitStatus, setSubmitStatus] = useState<"draft" | "active">((job?.status as "draft" | "active") || "draft");
     const [error, setError] = useState<string | null>(null);
+
+    const isEditMode = !!job;
 
     function addSkill(value: string) {
         const trimmed = value.trim().replace(/,$/, "").trim();
@@ -76,7 +97,12 @@ export default function PostJobForm() {
         formData.set("status", status);
         formData.set("skills", JSON.stringify(skills));
 
-        const result = await createJobPost(formData);
+        let result;
+        if (isEditMode && job?.id) {
+            result = await updateJobPost(job.id, formData);
+        } else {
+            result = await createJobPost(formData);
+        }
         setIsSubmitting(false);
 
         if (result.error) {
@@ -102,6 +128,7 @@ export default function PostJobForm() {
                             placeholder="e.g. Senior Software Engineer"
                             className={inputClass}
                             required
+                            defaultValue={job?.title || ""}
                         />
                     </div>
                     <div>
@@ -113,6 +140,7 @@ export default function PostJobForm() {
                             placeholder="e.g. Acme Corp"
                             className={inputClass}
                             required
+                            defaultValue={job?.company || ""}
                         />
                     </div>
                     <div>
@@ -124,12 +152,13 @@ export default function PostJobForm() {
                             placeholder="e.g. Manila, Philippines or Remote"
                             className={inputClass}
                             required
+                            defaultValue={job?.location || ""}
                         />
                     </div>
                     <div>
                         <FieldLabel required>Job Type</FieldLabel>
                         <div className="relative">
-                            <select id="job-type" name="job_type" className={selectClass} defaultValue="">
+                            <select id="job-type" name="job_type" className={selectClass} defaultValue={job?.job_type || ""}>
                                 <option value="" disabled>Select job type</option>
                                 {JOB_TYPES.map((t) => (
                                     <option key={t} value={t}>{t}</option>
@@ -143,7 +172,7 @@ export default function PostJobForm() {
                     <div>
                         <FieldLabel required>Experience Level</FieldLabel>
                         <div className="relative">
-                            <select id="job-experience" name="experience_level" className={selectClass} defaultValue="">
+                            <select id="job-experience" name="experience_level" className={selectClass} defaultValue={job?.experience_level || ""}>
                                 <option value="" disabled>Select level</option>
                                 {EXPERIENCE_LEVELS.map((l) => (
                                     <option key={l} value={l}>{l}</option>
@@ -163,7 +192,7 @@ export default function PostJobForm() {
                     <div>
                         <FieldLabel>Currency</FieldLabel>
                         <div className="relative">
-                            <select id="job-currency" name="salary_currency" className={selectClass} defaultValue="USD">
+                            <select id="job-currency" name="salary_currency" className={selectClass} defaultValue={job?.salary_currency || "USD"}>
                                 {CURRENCIES.map((c) => (
                                     <option key={c} value={c}>{c}</option>
                                 ))}
@@ -182,6 +211,7 @@ export default function PostJobForm() {
                             min={0}
                             placeholder="e.g. 50000"
                             className={inputClass}
+                            defaultValue={job?.salary_min || ""}
                         />
                     </div>
                     <div>
@@ -193,6 +223,7 @@ export default function PostJobForm() {
                             min={0}
                             placeholder="e.g. 90000"
                             className={inputClass}
+                            defaultValue={job?.salary_max || ""}
                         />
                     </div>
                     <div>
@@ -202,6 +233,7 @@ export default function PostJobForm() {
                             name="application_deadline"
                             type="date"
                             className={inputClass + " scheme-dark"}
+                            defaultValue={job?.application_deadline || ""}
                         />
                     </div>
                 </div>
@@ -220,6 +252,7 @@ export default function PostJobForm() {
                             placeholder="Describe the role, team culture, responsibilities, and what makes this opportunity exciting..."
                             className={textareaClass}
                             required
+                            defaultValue={job?.description || ""}
                         />
                     </div>
                     <div>
@@ -228,11 +261,12 @@ export default function PostJobForm() {
                             id="job-requirements"
                             name="requirements"
                             rows={5}
-                            placeholder={`• Bachelor’s degree in CS or related field
+                            placeholder={`• Bachelor's degree in CS or related field
 • 3+ years of experience with React
 • Strong understanding of REST APIs`}
                             className={textareaClass}
                             required
+                            defaultValue={job?.requirements || ""}
                         />
                         <p className="text-xs text-slate-600 mt-1.5">List each requirement on a new line with a bullet (•)</p>
                     </div>
@@ -244,6 +278,7 @@ export default function PostJobForm() {
                             rows={3}
                             placeholder={"• Experience with Next.js\n• Open-source contributions"}
                             className={textareaClass}
+                            defaultValue={job?.nice_to_have || ""}
                         />
                     </div>
 
@@ -310,7 +345,7 @@ export default function PostJobForm() {
                         onClick={() => handleSubmit("draft")}
                         className="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-300 bg-slate-800/80 border border-slate-700/50 hover:bg-slate-700/60 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {isSubmitting && submitStatus === "draft" ? "Saving…" : "Save as Draft"}
+                        {isSubmitting && submitStatus === "draft" ? (isEditMode ? "Saving…" : "Saving…") : (isEditMode ? "Update Draft" : "Save as Draft")}
                     </button>
                     <button
                         id="btn-publish-job"
@@ -325,7 +360,7 @@ export default function PostJobForm() {
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
                                 </svg>
-                                Publishing…
+                                {isEditMode ? "Updating…" : "Publishing…"}
                             </>
                         ) : (
                             <>
@@ -333,7 +368,7 @@ export default function PostJobForm() {
                                     <path d="M7.81825 1.18188C7.64251 1.00615 7.35759 1.00615 7.18185 1.18188L4.18185 4.18188C4.00611 4.35762 4.00611 4.64254 4.18185 4.81828C4.35759 4.99401 4.64251 4.99401 4.81825 4.81828L7.05005 2.58648V9.49996C7.05005 9.74849 7.25152 9.94996 7.50005 9.94996C7.74858 9.94996 7.95005 9.74849 7.95005 9.49996V2.58648L10.1819 4.81828C10.3576 4.99401 10.6425 4.99401 10.8183 4.81828C10.994 4.64254 10.994 4.35762 10.8183 4.18188L7.81825 1.18188Z" fill="currentColor"/>
                                     <path d="M2.5 9.99997C2.77614 9.99997 3 10.2238 3 10.5V12H12V10.5C12 10.2238 12.2239 9.99997 12.5 9.99997C12.7761 9.99997 13 10.2238 13 10.5V12.5C13 12.7761 12.7761 13 12.5 13H2.5C2.22386 13 2 12.7761 2 12.5V10.5C2 10.2238 2.22386 9.99997 2.5 9.99997Z" fill="currentColor"/>
                                 </svg>
-                                Publish Job
+                                {isEditMode ? "Update Job" : "Publish Job"}
                             </>
                         )}
                     </button>

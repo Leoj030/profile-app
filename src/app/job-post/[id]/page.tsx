@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import JobApplicationForm from "@/components/jobs/JobApplicationForm";
@@ -58,19 +59,30 @@ export default async function JobPostPage({ params }: { params: Promise<{ id: st
     const { id } = await params;
     const supabase = await createClient();
 
+    // Check if user is authenticated
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    // First fetch the job without status filter to check ownership
     const { data: job, error } = await supabase
         .from("job_posts")
         .select("*")
         .eq("id", id)
-        .eq("status", "active")
         .single();
 
     if (error || !job) notFound();
 
     const post = job as JobPost;
+    const isOwner = user && job.recruiter_id === user.id;
+
+    // If job is not active and not owner, show 404
+    if (job.status !== "active" && !isOwner) {
+        notFound();
+    }
 
     return (
-        <div className="min-h-screen bg-[#0f1629] text-slate-300 font-sans">
+        <div className="min-h-screen bg-[#1a2340] text-slate-300 font-sans">
             {/* Background grid */}
             <div
                 className="fixed inset-0 pointer-events-none z-0"
@@ -86,16 +98,31 @@ export default async function JobPostPage({ params }: { params: Promise<{ id: st
                     {/* ── LEFT: Job Details ── */}
                     <div className="flex-1 min-w-0 space-y-6">
                         {/* Header card */}
-                        <div className="bg-slate-900/60 border border-slate-800/50 rounded-2xl p-7 backdrop-blur-sm">
+                        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-7 backdrop-blur-sm">
                             <div className="flex items-start gap-5">
                                 <div className="w-14 h-14 rounded-xl bg-linear-to-br from-purple-500/30 to-indigo-600/30 border border-purple-500/20 flex items-center justify-center text-2xl font-black text-white shrink-0">
                                     {post.company[0]}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h1 className="text-2xl lg:text-3xl font-black text-white tracking-tight leading-tight">
-                                        {post.title}
-                                    </h1>
-                                    <p className="text-slate-400 font-medium mt-1">{post.company}</p>
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div>
+                                            <h1 className="text-2xl lg:text-3xl font-black text-white tracking-tight leading-tight">
+                                                {post.title}
+                                            </h1>
+                                            <p className="text-slate-400 font-medium mt-1">{post.company}</p>
+                                        </div>
+                                        {isOwner && (
+                                            <Link
+                                                href={`/job-post/${id}/edit`}
+                                                className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-xs font-semibold hover:bg-indigo-500/20 transition-colors"
+                                            >
+                                                <svg width="12" height="12" viewBox="0 0 15 15" fill="none">
+                                                    <path d="M11.8536 1.85355C11.6583 1.65829 11.3417 1.65829 11.1465 1.85355L9.14645 3.85355L11.1465 5.85355L13.1465 3.85355C13.3417 3.65829 13.3417 3.34171 13.1465 3.14645L11.8536 1.85355ZM10.4393 4.56066L8.15363 6.84633C8.08531 6.91465 8.03251 6.9959 7.99807 7.08567L7.03085 9.60391C6.96336 9.77994 7.0142 9.97977 7.15187 10.1037C7.28955 10.2276 7.48694 10.2504 7.64645 10.1607L10.1647 9.19349C10.2545 9.15905 10.3357 9.10625 10.404 9.03794L12.6897 6.75227L10.4393 4.56066ZM8.85355 3.14645L11.8536 6.14645L12.8536 5.14645L9.85355 2.14645L8.85355 3.14645ZM2 10C2 9.44772 2.44772 9 3 9H4.5C4.77614 9 5 9.22386 5 9.5C5 9.77614 4.77614 10 4.5 10H3.5C3.22386 10 3 10.2239 3 10.5V11.5C3 11.7761 3.22386 12 3.5 12H10.5C10.7761 12 11 11.7761 11 11.5V11C11 10.7239 11.2239 10.5 11.5 10.5C11.7761 10.5 12 10.7239 12 11V11.5C12 12.3284 11.3284 13 10.5 13H3.5C2.67157 13 2 12.3284 2 11.5V10Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"/>
+                                                </svg>
+                                                Edit
+                                            </Link>
+                                        )}
+                                    </div>
                                     <div className="flex flex-wrap gap-2 mt-3">
                                         <span className={`${badgeBase} bg-indigo-500/15 text-indigo-300 border-indigo-500/25`}>
                                             {post.job_type}
@@ -164,20 +191,20 @@ export default async function JobPostPage({ params }: { params: Promise<{ id: st
                         </div>
 
                         {/* Description */}
-                        <div className="bg-slate-900/60 border border-slate-800/50 rounded-2xl p-7 backdrop-blur-sm">
+                        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-7 backdrop-blur-sm">
                             <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Job Description</h2>
                             <p className="text-slate-300 text-sm leading-7 whitespace-pre-wrap">{post.description}</p>
                         </div>
 
                         {/* Requirements */}
-                        <div className="bg-slate-900/60 border border-slate-800/50 rounded-2xl p-7 backdrop-blur-sm">
+                        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-7 backdrop-blur-sm">
                             <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Requirements</h2>
                             <p className="text-slate-300 text-sm leading-7 whitespace-pre-wrap">{post.requirements}</p>
                         </div>
 
                         {/* Nice to Have */}
                         {post.nice_to_have && (
-                            <div className="bg-slate-900/60 border border-slate-800/50 rounded-2xl p-7 backdrop-blur-sm">
+                            <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-7 backdrop-blur-sm">
                                 <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Nice to Have</h2>
                                 <p className="text-slate-300 text-sm leading-7 whitespace-pre-wrap">{post.nice_to_have}</p>
                             </div>
@@ -185,7 +212,7 @@ export default async function JobPostPage({ params }: { params: Promise<{ id: st
 
                         {/* Skills */}
                         {post.skills && post.skills.length > 0 && (
-                            <div className="bg-slate-900/60 border border-slate-800/50 rounded-2xl p-7 backdrop-blur-sm">
+                            <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-7 backdrop-blur-sm">
                                 <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Required Skills</h2>
                                 <div className="flex flex-wrap gap-2">
                                     {post.skills.map((skill) => (
@@ -203,7 +230,7 @@ export default async function JobPostPage({ params }: { params: Promise<{ id: st
 
                     {/* ── RIGHT: Application Form ── */}
                     <div className="w-full lg:w-[420px] shrink-0">
-                        <div className="sticky top-6 bg-slate-900/70 border border-slate-800/50 rounded-2xl p-6 backdrop-blur-sm">
+                        <div className="sticky top-6 bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 backdrop-blur-sm">
                             <h2 className="text-base font-bold text-white mb-1">Apply for this Role</h2>
                             <p className="text-xs text-slate-500 mb-6">
                                 Fill out the form below. You don&apos;t need an account to apply.

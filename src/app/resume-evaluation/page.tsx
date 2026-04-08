@@ -8,7 +8,7 @@ import UploadZone from "./UploadZone";
 
 export default function ResumeUploadPage() {
     return (
-        <main className="min-h-screen bg-[#0f1629] text-slate-300 pt-32 pb-20 px-6 lg:px-12 hero relative overflow-hidden">
+        <main className="min-h-screen bg-[#1a2340] text-slate-300 pt-32 pb-20 px-6 lg:px-12 hero relative overflow-hidden">
             {/* Ambient Background Glows */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] bg-purple-600/10 rounded-full blur-[140px] animate-pulse" />
             <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/20 blur-[120px] rounded-full -translate-y-1/2 animate-pulse [animation-delay:1s]"></div>
@@ -73,7 +73,7 @@ export default function ResumeUploadPage() {
 
                     {/* Right: Feature Highlights */}
                     <div className="lg:col-span-5 space-y-6">
-                        <div className="p-6 bg-slate-900/60 border border-slate-700/60 rounded-2xl hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-colors">
+                        <div className="p-6 bg-slate-800/50 border border-slate-700/50 rounded-2xl hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-colors">
                             <div className="flex items-center gap-4 mb-3">
                                 <div className="p-2 bg-indigo-500/10 rounded-lg">
                                     <MagnifyingGlassIcon className="w-5 h-5 text-indigo-400" />
@@ -89,7 +89,7 @@ export default function ResumeUploadPage() {
                             </p>
                         </div>
 
-                        <div className="p-6 bg-slate-900/60 border border-slate-700/60 rounded-2xl hover:border-purple-500/50 hover:bg-purple-500/5 transition-colors">
+                        <div className="p-6 bg-slate-800/50 border border-slate-700/50 rounded-2xl hover:border-purple-500/50 hover:bg-purple-500/5 transition-colors">
                             <div className="flex items-center gap-4 mb-3">
                                 <div className="p-2 bg-purple-500/10 rounded-lg">
                                     <MagicWandIcon className="w-5 h-5 text-purple-400" />
@@ -105,7 +105,7 @@ export default function ResumeUploadPage() {
                             </p>
                         </div>
 
-                        <div className="p-6 bg-slate-900/60 border border-slate-700/60 rounded-2xl hover:border-teal-500/50 hover:bg-teal-500/5 transition-colors">
+                        <div className="p-6 bg-slate-800/50 border border-slate-700/50 rounded-2xl hover:border-teal-500/50 hover:bg-teal-500/5 transition-colors">
                             <div className="flex items-center gap-4 mb-3">
                                 <div className="p-2 bg-teal-500/10 rounded-lg">
                                     <LightningBoltIcon className="w-5 h-5 text-teal-400" />

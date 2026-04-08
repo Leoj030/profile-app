@@ -23,7 +23,7 @@ export default function ResultSkeleton() {
     }, []);
 
     return (
-        <div className="flex h-screen bg-[#0f1629] text-slate-300 font-sans overflow-hidden relative">
+        <div className="flex h-screen bg-[#1a2340] text-slate-300 font-sans overflow-hidden relative">
             {/* Subtle background radial dots */}
             <div
                 className="absolute inset-0 pointer-events-none z-0"

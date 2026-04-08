@@ -44,7 +44,7 @@ export default async function ResultPage({ searchParams }: { searchParams: Promi
 
     if (!rawData || !rawData.result) {
         return (
-            <div className="min-h-screen bg-[#0f1629] text-slate-300 flex items-center justify-center">
+            <div className="min-h-screen bg-[#1a2340] text-slate-300 flex items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-3xl font-bold text-white mb-4">Evaluation Not Found</h1>
                     <p className="text-slate-400">It may have been deleted, or you might not have access if it belongs to someone else.</p>

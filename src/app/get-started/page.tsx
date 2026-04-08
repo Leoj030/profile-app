@@ -19,14 +19,14 @@ export default async function GetStarted() {
         redirect("/signin");
     }
 
-    // Already has a profile → redirect to dashboard
+    // Already has a complete profile → redirect to dashboard
     const { data: profile } = await supabase
         .from("profiles")
-        .select("id")
+        .select("user_role")
         .eq("id", user.id)
         .single();
 
-    if (profile) {
+    if (profile?.user_role) {
         redirect("/dashboard");
     }
 
@@ -35,7 +35,7 @@ export default async function GetStarted() {
          * Full-screen fixed overlay so this page sits above the root layout's
          * Header and Footer — no layout.tsx changes needed.
          */
-        <div className="fixed inset-0 z-200 bg-[#0f1629] flex flex-col items-center justify-center overflow-y-auto">
+        <div className="fixed inset-0 z-200 bg-[#1a2340] flex flex-col items-center justify-center overflow-y-auto">
             {/* Subtle background radial dots (matching global .hero style) */}
             <div
                 className="absolute inset-0 pointer-events-none"

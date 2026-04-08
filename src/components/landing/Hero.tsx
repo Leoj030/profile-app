@@ -31,14 +31,14 @@ export default function Hero() {
             return;
         }
 
-        // Authenticated → check if they already have a profile
+        // Authenticated → check if they already have a complete profile
         const { data: profile } = await supabase
             .from("profiles")
-            .select("id")
+            .select("user_role")
             .eq("id", user.id)
             .single();
 
-        if (profile) {
+        if (profile?.user_role) {
             router.push("/dashboard");
         } else {
             router.push("/get-started");

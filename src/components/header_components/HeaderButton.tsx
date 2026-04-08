@@ -12,7 +12,7 @@ export default function HeaderButton() {
     const pathname = usePathname();
     const isJobPostPage = pathname?.startsWith("/job-post");
     const [user, setUser] = useState<User | null>(null);
-    const [profile, setProfile] = useState<{ display_name?: string } | null>(null);
+    const [profile, setProfile] = useState<{ username?: string } | null>(null);
     const [loading, setLoading] = useState(true);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -25,7 +25,7 @@ export default function HeaderButton() {
                 setUser(user);
                 const { data: profile } = await supabase
                     .from("profiles")
-                    .select("id, display_name")
+                    .select("id, username")
                     .eq("id", user.id)
                     .single();
                 setProfile(profile);
@@ -74,11 +74,11 @@ export default function HeaderButton() {
 
         const { data: profile } = await supabase
             .from("profiles")
-            .select("id")
+            .select("user_role")
             .eq("id", user.id)
             .single();
 
-        if (profile) {
+        if (profile?.user_role) {
             router.push("/dashboard");
         } else {
             router.push("/get-started");
@@ -90,7 +90,7 @@ export default function HeaderButton() {
     }
 
     if (user) {
-        const displayName = profile?.display_name || user.user_metadata?.full_name || user.email || "User";
+        const displayName = profile?.username || user.user_metadata?.full_name || user.email?.split("@")[0] || "User";
         const initials = displayName
             .split(" ")
             .map((w: string) => w[0])

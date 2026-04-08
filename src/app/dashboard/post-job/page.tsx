@@ -23,7 +23,7 @@ export default async function PostJobPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#0f1629] text-slate-300 font-sans pt-32 pb-20">
+        <div className="min-h-screen bg-[#1a2340] text-slate-300 font-sans pt-32 pb-20">
             {/* Background grid */}
             <div
                 className="fixed inset-0 pointer-events-none z-0"

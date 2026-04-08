@@ -51,7 +51,7 @@ const getScoreStatus = (score: number) => {
 
 const ScoreGaugeMini = ({ score }: { score: number }) => (
         <div
-        className={`radial-progress text-indigo-500 bg-[#0f1629] border-2 border-slate-800 shadow-md`}
+        className={`radial-progress text-indigo-500 bg-[#1a2340] border-2 border-slate-800 shadow-md`}
         style={
             {
                 "--value": score,
@@ -348,7 +348,7 @@ export default function EvaluationView({
     };
 
     return (
-        <div className="flex h-screen bg-[#0f1629] text-slate-300 font-sans overflow-hidden">
+        <div className="flex h-screen bg-[#1a2340] text-slate-300 font-sans overflow-hidden">
             {/* Subtle background radial dots */}
             <div
                 className="absolute inset-0 pointer-events-none z-0"
